@@ -1,0 +1,293 @@
+{
+  "info": {
+    "name": "Labora API - Lab Management Collection",
+    "description": "Koleksi Postman untuk pengujian REST API sistem Labora (FastAPI + PostgreSQL/SQLAlchemy)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Auth",
+      "item": [
+        {
+          "name": "Login (Mahasiswa - Nadia Putri)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"nadia.putri@kampus.ac.id\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Login (Laboran - Sinta Rahma)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"sinta@kampus.ac.id\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/auth/login", "host": ["{{base_url}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/api/auth/me", "host": ["{{base_url}}"], "path": ["api", "auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Pengelolaan Akun Pengguna (UC-02)",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{laboran_token}}" }],
+            "url": { "raw": "{{base_url}}/api/users", "host": ["{{base_url}}"], "path": ["api", "users"] }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{laboran_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Mahasiswa Baru\",\n  \"email\": \"mhs.baru@kampus.ac.id\",\n  \"password\": \"password123\",\n  \"nomor_identitas\": \"2204101999\",\n  \"role\": \"Mahasiswa\",\n  \"status_akun\": \"Aktif\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/users", "host": ["{{base_url}}"], "path": ["api", "users"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Ketersediaan Ruangan (UC-03)",
+      "item": [
+        {
+          "name": "Check Availability",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/rooms/availability?tanggal=2026-11-16&jam_mulai=13:00&jam_selesai=15:00",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rooms", "availability"],
+              "query": [
+                { "key": "tanggal", "value": "2026-11-16" },
+                { "key": "jam_mulai", "value": "13:00" },
+                { "key": "jam_selesai", "value": "15:00" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Room Agenda",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/rooms/agenda?tanggal=2026-11-16",
+              "host": ["{{base_url}}"],
+              "path": ["api", "rooms", "agenda"],
+              "query": [{ "key": "tanggal", "value": "2026-11-16" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Peminjaman (UC-04 & UC-06)",
+      "item": [
+        {
+          "name": "Create Booking (Ruangan & Alat Gabungan)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{access_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tujuan\": \"Praktikum Mandiri Pengukuran Sinyal\",\n  \"catatan\": \"Kelompok 2 tugas mandiri\",\n  \"ruang\": {\n    \"id_ruangan\": 1,\n    \"tanggal\": \"2026-11-18\",\n    \"jam_mulai\": \"13:00\",\n    \"jam_selesai\": \"15:00\"\n  },\n  \"alat\": [\n    {\n      \"id_alat\": 1,\n      \"jumlah_pinjam\": 1,\n      \"tenggat_pengembalian\": \"2026-11-19T16:00:00\"\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/bookings", "host": ["{{base_url}}"], "path": ["api", "bookings"] }
+          }
+        },
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/api/bookings/my", "host": ["{{base_url}}"], "path": ["api", "bookings", "my"] }
+          }
+        },
+        {
+          "name": "Get Booking Detail",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{access_token}}" }],
+            "url": { "raw": "{{base_url}}/api/bookings/1", "host": ["{{base_url}}"], "path": ["api", "bookings", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Persetujuan Alat Khusus (UC-05)",
+      "item": [
+        {
+          "name": "List Pending Approvals",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{pengampu_token}}" }],
+            "url": { "raw": "{{base_url}}/api/approvals", "host": ["{{base_url}}"], "path": ["api", "approvals"] }
+          }
+        },
+        {
+          "name": "Submit Approval Decision",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{pengampu_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Disetujui\",\n  \"catatan\": \"Disetujui untuk kegiatan tugas akhir\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/approvals/3/decision", "host": ["{{base_url}}"], "path": ["api", "approvals", "3", "decision"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Pengembalian Bertahap (UC-07)",
+      "item": [
+        {
+          "name": "List Active Loans for Return",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{laboran_token}}" }],
+            "url": { "raw": "{{base_url}}/api/returns/active-loans", "host": ["{{base_url}}"], "path": ["api", "returns", "active-loans"] }
+          }
+        },
+        {
+          "name": "Process Partial Return",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{laboran_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_peminjaman\": 1,\n  \"catatan\": \"Penerimaan pengembalian unit kedua\",\n  \"items\": [\n    {\n      \"id_alokasi\": 2,\n      \"kondisi_kembali\": \"Baik\",\n      \"catatan\": \"Kondisi layar normal\"\n    }\n  ]\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/returns", "host": ["{{base_url}}"], "path": ["api", "returns"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Pemantauan Keterlambatan (UC-08)",
+      "item": [
+        {
+          "name": "List Late Records",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{laboran_token}}" }],
+            "url": { "raw": "{{base_url}}/api/late-records", "host": ["{{base_url}}"], "path": ["api", "late-records"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Inventaris Alat & Unit (UC-09)",
+      "item": [
+        {
+          "name": "List Equipment Categories",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/equipment", "host": ["{{base_url}}"], "path": ["api", "equipment"] }
+          }
+        },
+        {
+          "name": "List Physical Units",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/equipment/units", "host": ["{{base_url}}"], "path": ["api", "equipment", "units"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Jadwal Kuliah & Pengecualian (UC-10)",
+      "item": [
+        {
+          "name": "List Schedules",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/schedules", "host": ["{{base_url}}"], "path": ["api", "schedules"] }
+          }
+        },
+        {
+          "name": "List Schedule Exceptions",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/schedule-exceptions", "host": ["{{base_url}}"], "path": ["api", "schedule-exceptions"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Laporan Bulanan (UC-11)",
+      "item": [
+        {
+          "name": "Get Monthly Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{laboran_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/reports/monthly?bulan=11&tahun=2026",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "monthly"],
+              "query": [
+                { "key": "bulan", "value": "11" },
+                { "key": "tahun", "value": "2026" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Export Monthly Report CSV",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{laboran_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/reports/monthly/export?bulan=11&tahun=2026",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "monthly", "export"],
+              "query": [
+                { "key": "bulan", "value": "11" },
+                { "key": "tahun", "value": "2026" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000" },
+    { "key": "access_token", "value": "" },
+    { "key": "laboran_token", "value": "" },
+    { "key": "pengampu_token", "value": "" }
+  ]
+}
