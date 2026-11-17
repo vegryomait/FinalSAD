@@ -8,6 +8,17 @@ def run_tests():
     print("Memulai Pengujian Komprehensif Sistem labora.")
     print("==================================================")
 
+    # Persiapan idempotensi: pastikan unit uji siap dipinjam
+    from backend.app.database import SessionLocal
+    from backend.app.models import UnitAlat
+    _db = SessionLocal()
+    _db.query(UnitAlat).filter(UnitAlat.kode_inventaris.in_(["OSC-001", "OSC-004"])).update({
+        "status": "Tersedia",
+        "kondisi": "Baik"
+    }, synchronize_session=False)
+    _db.commit()
+    _db.close()
+
     # 1. Test UC-01: Login Mahasiswa & Laboran
     print("\n[UC-01] Pengujian Autentikasi Login:")
     res_nadia = client.post("/api/auth/login", json={"username": "nadia.putri@kampus.ac.id", "password": "password123"})
