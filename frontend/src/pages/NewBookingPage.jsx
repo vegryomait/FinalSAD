@@ -58,6 +58,19 @@ export default function NewBookingPage({ initialRoomPref, onBookingSuccess }) {
         if (eq.length > 0) {
           setToolToAdd(String(eq[0].id_alat));
         }
+
+        if (initialRoomPref?.id_alat) {
+          setKebutuhan('alat');
+          const eqItem = eq.find((e) => e.id_alat === initialRoomPref.id_alat);
+          if (eqItem) {
+            setSelectedTools([{
+              id_alat: eqItem.id_alat,
+              nama_alat: eqItem.nama_alat,
+              jumlah_pinjam: 1,
+              alat_khusus: eqItem.alat_khusus,
+            }]);
+          }
+        }
       } catch (err) {
         console.error(err);
       }

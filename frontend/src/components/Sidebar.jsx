@@ -31,7 +31,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     {
       section: 'LAYANAN',
       items: [
-        { id: 'availability', label: 'Ketersediaan ruangan', code: '03', icon: CalendarDays },
+        { id: 'availability', label: 'Ketersediaan ruang & alat', code: '03', icon: CalendarDays },
         { id: 'new-booking', label: 'Ajukan peminjaman', code: '04', icon: FilePlus },
         { id: 'my-bookings', label: 'Riwayat peminjaman', code: '06', icon: Clock },
       ]

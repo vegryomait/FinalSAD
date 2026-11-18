@@ -42,7 +42,7 @@ export default function App() {
 
   const getBreadcrumb = () => {
     switch (activeTab) {
-      case 'availability': return 'Ketersediaan ruangan (UC-03)';
+      case 'availability': return 'Ketersediaan ruangan dan alat (UC-03)';
       case 'new-booking': return 'Ajukan peminjaman (UC-04)';
       case 'my-bookings': return 'Riwayat peminjaman (UC-06)';
       case 'approvals': return 'Persetujuan alat khusus (UC-05)';
