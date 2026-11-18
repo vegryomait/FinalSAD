@@ -26,10 +26,10 @@ def run_tests():
     token_nadia = res_nadia.json()["access_token"]
     print("  ✓ Login Mahasiswa (Nadia Putri) berhasil.")
 
-    res_sinta = client.post("/api/auth/login", json={"username": "sinta@kampus.ac.id", "password": "password123"})
-    assert res_sinta.status_code == 200, f"Login Sinta gagal: {res_sinta.text}"
-    token_sinta = res_sinta.json()["access_token"]
-    print("  ✓ Login Laboran (Sinta Rahma) berhasil.")
+    res_dina = client.post("/api/auth/login", json={"username": "dina@kampus.ac.id", "password": "password123"})
+    assert res_dina.status_code == 200, f"Login Dina gagal: {res_dina.text}"
+    token_dina = res_dina.json()["access_token"]
+    print("  ✓ Login Laboran (Dina) berhasil.")
 
     res_budi = client.post("/api/auth/login", json={"username": "budi@kampus.ac.id", "password": "password123"})
     assert res_budi.status_code == 200, f"Login Budi gagal: {res_budi.text}"
@@ -37,7 +37,7 @@ def run_tests():
     print("  ✓ Login Dosen Pengampu (Dr. Budi Santoso) berhasil.")
 
     headers_nadia = {"Authorization": f"Bearer {token_nadia}"}
-    headers_sinta = {"Authorization": f"Bearer {token_sinta}"}
+    headers_sinta = {"Authorization": f"Bearer {token_dina}"}
     headers_budi = {"Authorization": f"Bearer {token_budi}"}
 
     # 2. Test UC-02: Pengelolaan Akun Pengguna

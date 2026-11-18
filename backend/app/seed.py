@@ -23,29 +23,29 @@ def seed_database():
     pwd = get_password_hash("password123")
 
     # 1. Users
-    sinta = Pengguna(
-        nama="Sinta Rahma",
-        email="sinta@kampus.ac.id",
+    dina = Pengguna(
+        nama="Dina",
+        email="dina@kampus.ac.id",
         password=pwd,
         nomor_identitas="LAB-001",
         role="Laboran",
         status_akun="Aktif"
     )
-    db.add(sinta)
+    db.add(dina)
     db.commit()
-    db.refresh(sinta)
+    db.refresh(dina)
 
     users = [
-        Pengguna(nama="Nadia Putri", email="nadia.putri@kampus.ac.id", password=pwd, nomor_identitas="2204101021", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=sinta.id_pengguna),
-        Pengguna(nama="Rizky Pratama", email="rizky@kampus.ac.id", password=pwd, nomor_identitas="2204101048", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=sinta.id_pengguna),
-        Pengguna(nama="Dr. Budi Santoso", email="budi@kampus.ac.id", password=pwd, nomor_identitas="198603121", role="Dosen Pengampu", status_akun="Aktif", dibuat_oleh=sinta.id_pengguna),
-        Pengguna(nama="Dr. Maya Dewi", email="maya@kampus.ac.id", password=pwd, nomor_identitas="198904053", role="Dosen", status_akun="Aktif", dibuat_oleh=sinta.id_pengguna),
-        Pengguna(nama="Andi Saputra", email="andi@kampus.ac.id", password=pwd, nomor_identitas="2104101009", role="Mahasiswa", status_akun="Nonaktif", dibuat_oleh=sinta.id_pengguna),
-        Pengguna(nama="Farhan Akbar", email="farhan@kampus.ac.id", password=pwd, nomor_identitas="2204101033", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=sinta.id_pengguna),
-        Pengguna(nama="Rina Lestari", email="rina@kampus.ac.id", password=pwd, nomor_identitas="2204101055", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=sinta.id_pengguna),
-        Pengguna(nama="Dimas Putra", email="dimas@kampus.ac.id", password=pwd, nomor_identitas="2204101062", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=sinta.id_pengguna),
-        Pengguna(nama="Prof. Hendra Kusuma", email="hendra@kampus.ac.id", password=pwd, nomor_identitas="197508151", role="Kepala Laboratorium", status_akun="Aktif", dibuat_oleh=sinta.id_pengguna),
-        Pengguna(nama="Dr. Ratna Sari", email="ratna.sari@kampus.ac.id", password=pwd, nomor_identitas="197001011", role="Dekan", status_akun="Aktif", dibuat_oleh=sinta.id_pengguna),
+        Pengguna(nama="Nadia Putri", email="nadia.putri@kampus.ac.id", password=pwd, nomor_identitas="2204101021", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=dina.id_pengguna),
+        Pengguna(nama="Rizky Pratama", email="rizky@kampus.ac.id", password=pwd, nomor_identitas="2204101048", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=dina.id_pengguna),
+        Pengguna(nama="Dr. Budi Santoso", email="budi@kampus.ac.id", password=pwd, nomor_identitas="198603121", role="Dosen Pengampu", status_akun="Aktif", dibuat_oleh=dina.id_pengguna),
+        Pengguna(nama="Dr. Maya Dewi", email="maya@kampus.ac.id", password=pwd, nomor_identitas="198904053", role="Dosen", status_akun="Aktif", dibuat_oleh=dina.id_pengguna),
+        Pengguna(nama="Andi Saputra", email="andi@kampus.ac.id", password=pwd, nomor_identitas="2104101009", role="Mahasiswa", status_akun="Nonaktif", dibuat_oleh=dina.id_pengguna),
+        Pengguna(nama="Farhan Akbar", email="farhan@kampus.ac.id", password=pwd, nomor_identitas="2204101033", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=dina.id_pengguna),
+        Pengguna(nama="Rina Lestari", email="rina@kampus.ac.id", password=pwd, nomor_identitas="2204101055", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=dina.id_pengguna),
+        Pengguna(nama="Dimas Putra", email="dimas@kampus.ac.id", password=pwd, nomor_identitas="2204101062", role="Mahasiswa", status_akun="Aktif", dibuat_oleh=dina.id_pengguna),
+        Pengguna(nama="Ronald Tumbelaka", email="ronald@kampus.ac.id", password=pwd, nomor_identitas="197508151", role="Kepala Laboratorium", status_akun="Aktif", dibuat_oleh=dina.id_pengguna),
+        Pengguna(nama="Dr. Ratna Sari", email="ratna.sari@kampus.ac.id", password=pwd, nomor_identitas="197001011", role="Dekan", status_akun="Aktif", dibuat_oleh=dina.id_pengguna),
     ]
     db.add_all(users)
     db.commit()
