@@ -67,7 +67,6 @@ export default function LoginPage() {
         </div>
 
         <div className="text-xs text-teal-400/60 space-y-1">
-          <div className="font-semibold text-teal-300">FAKULTAS TEKNIK</div>
           <div>Akses terkelola untuk civitas akademika · TA 2026/2027</div>
         </div>
       </div>

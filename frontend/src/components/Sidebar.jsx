@@ -102,9 +102,8 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       </nav>
 
       {/* Footer Info */}
-      <div className="p-4 border-t border-teal-800/40 text-[11px] text-teal-400/60 space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="font-semibold text-teal-300">FAKULTAS TEKNIK</span>
+      <div className="p-4 border-t border-teal-800/40 text-[11px] text-teal-400/60">
+        <div className="flex items-center justify-end">
           <button
             onClick={logout}
             className="text-teal-300 hover:text-white flex items-center space-x-1"
@@ -114,7 +113,6 @@ export default function Sidebar({ activeTab, setActiveTab }) {
             <span>Keluar</span>
           </button>
         </div>
-        <div>Portal layanan terpadu · 2026/2027</div>
       </div>
     </aside>
   );
