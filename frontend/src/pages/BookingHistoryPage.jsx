@@ -210,13 +210,15 @@ export default function BookingHistoryPage() {
             <div className="p-4 rounded-xl bg-teal-50/50 border border-teal-100">
               <div className="text-xs font-bold text-teal-800">02 Pengampu setuju</div>
               <div className="text-[11px] text-slate-500 mt-0.5">
-                {dosenApp?.waktu_keputusan ? new Date(dosenApp.waktu_keputusan).toLocaleString('id-ID') : dosenApp?.status || '—'}
+                {selectedBooking?.detail_alat_list?.some((da) => da.alat?.alat_khusus)
+                  ? (dosenApp?.waktu_keputusan ? new Date(dosenApp.waktu_keputusan).toLocaleString('id-ID') : dosenApp?.status || 'Menunggu')
+                  : 'Tidak diperlukan (alat biasa)'}
               </div>
             </div>
             <div className="p-4 rounded-xl bg-teal-50/50 border border-teal-100">
-              <div className="text-xs font-bold text-teal-800">03 Laboran setuju</div>
+              <div className="text-xs font-bold text-teal-800">03 Laboran setuju (Kak Dina)</div>
               <div className="text-[11px] text-slate-500 mt-0.5">
-                {laboranApp?.waktu_keputusan ? new Date(laboranApp.waktu_keputusan).toLocaleString('id-ID') : laboranApp?.status || '—'}
+                {laboranApp?.waktu_keputusan ? new Date(laboranApp.waktu_keputusan).toLocaleString('id-ID') : laboranApp?.status || 'Menunggu'}
               </div>
             </div>
             <div className="p-4 rounded-xl bg-teal-50/50 border border-teal-100">

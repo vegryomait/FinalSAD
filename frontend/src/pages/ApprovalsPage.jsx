@@ -64,9 +64,9 @@ export default function ApprovalsPage() {
         <div className="text-xs font-semibold tracking-wider text-teal-700 uppercase">
           UC-05 / DOSEN PENGAMPU · LABORAN / PERSETUJUAN
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Persetujuan alat khusus</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Persetujuan peminjaman</h1>
         <p className="text-sm text-slate-500 mt-1">
-          Tinjau dua keputusan persetujuan secara terpisah. Sistem mengalokasikan unit fisik secara otomatis setelah kedua pihak menyetujui.
+          Alat khusus memerlukan 2 tahap persetujuan (Dosen Pengampu & Kak Dina). Alat biasa hanya membutuhkan persetujuan langsung dari Kak Dina (Laboran).
         </p>
       </div>
 
@@ -119,7 +119,14 @@ export default function ApprovalsPage() {
                       <div className="text-slate-600">{b.peminjam_nama}</div>
                     </td>
                     <td className="py-3.5 px-6 font-semibold text-slate-800">
-                      {firstTool?.nama_alat || '—'}
+                      <div>{firstTool?.nama_alat || '—'}</div>
+                      <div className="text-[10px] font-normal mt-0.5">
+                        {app.has_alat_khusus ? (
+                          <span className="text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">Alat Khusus</span>
+                        ) : (
+                          <span className="text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">Alat Biasa</span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3.5 px-6 font-mono text-slate-700">
                       {firstTool?.jumlah_pinjam} unit
@@ -128,7 +135,7 @@ export default function ApprovalsPage() {
                       {firstTool?.tenggat ? new Date(firstTool.tenggat).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' · ' + new Date(firstTool.tenggat).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '—'}
                     </td>
                     <td className="py-3.5 px-6">
-                      <Badge status={app.status_dosen_pengampu || 'Menunggu'} />
+                      <Badge status={app.status_dosen_pengampu || (app.has_alat_khusus ? 'Menunggu' : 'Tidak diperlukan')} />
                     </td>
                     <td className="py-3.5 px-6">
                       <Badge status={app.status_laboran || 'Menunggu'} />
@@ -189,47 +196,58 @@ export default function ApprovalsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Panel 1: Dosen Pengampu */}
             <div className={`p-6 rounded-2xl border ${
-              isDosenPengampu ? 'border-teal-200 bg-teal-50/20' : 'border-slate-200 bg-slate-50/50'
+              selectedDetail.has_alat_khusus && isDosenPengampu ? 'border-teal-200 bg-teal-50/20' : 'border-slate-200 bg-slate-50/50'
             } space-y-4`}>
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900">Dosen Pengampu · Dr. Budi Santoso</h3>
-                  <div className="text-[11px] text-slate-400">Persetujuan akademik peminjaman alat khusus</div>
+                  <div className="text-[11px] text-slate-400">Persetujuan akademik alat khusus</div>
                 </div>
-                <Badge status={selectedDetail.status_dosen_pengampu || 'Menunggu'} />
+                <Badge status={selectedDetail.status_dosen_pengampu || (selectedDetail.has_alat_khusus ? 'Menunggu' : 'Tidak diperlukan')} />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
-                  Catatan keputusan
-                </label>
-                <textarea
-                  disabled={!isDosenPengampu || selectedDetail.status_dosen_pengampu !== 'Menunggu'}
-                  value={dosenNote || selectedDetail.catatan_dosen_pengampu || ''}
-                  onChange={(e) => setDosenNote(e.target.value)}
-                  placeholder="Tulis hasil peninjauan pengajuan..."
-                  rows={3}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-teal-600 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
-                />
-              </div>
-
-              {isDosenPengampu && selectedDetail.status_dosen_pengampu === 'Menunggu' && (
-                <div className="flex space-x-3 pt-2">
-                  <button
-                    disabled={loading}
-                    onClick={() => handleDecision(selectedDetail.id_persetujuan, 'Disetujui', dosenNote)}
-                    className="flex-1 py-2.5 px-4 rounded-xl bg-[#006d64] hover:bg-[#005851] text-white font-medium text-xs transition shadow-xs cursor-pointer"
-                  >
-                    Setujui · Pengampu
-                  </button>
-                  <button
-                    disabled={loading}
-                    onClick={() => handleDecision(selectedDetail.id_persetujuan, 'Ditolak', dosenNote)}
-                    className="py-2.5 px-4 rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 font-medium text-xs transition cursor-pointer"
-                  >
-                    Tolak · Pengampu
-                  </button>
+              {!selectedDetail.has_alat_khusus ? (
+                <div className="p-4 rounded-xl bg-slate-100/80 border border-slate-200 text-xs text-slate-600 leading-relaxed">
+                  <div className="font-semibold text-slate-800">Alat Biasa (Bukan Alat Khusus)</div>
+                  <p className="mt-1 text-slate-500">
+                    Peminjaman ini hanya memuat peralatan biasa. Sesuai ketentuan, persetujuan Dosen Pengampu <strong>tidak diperlukan</strong> dan langsung disetujui oleh <strong>Kak Dina (Laboran)</strong>.
+                  </p>
                 </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                      Catatan keputusan
+                    </label>
+                    <textarea
+                      disabled={!isDosenPengampu || selectedDetail.status_dosen_pengampu !== 'Menunggu'}
+                      value={dosenNote || selectedDetail.catatan_dosen_pengampu || ''}
+                      onChange={(e) => setDosenNote(e.target.value)}
+                      placeholder="Tulis hasil peninjauan pengajuan..."
+                      rows={3}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs bg-white focus:ring-2 focus:ring-teal-600 focus:outline-none disabled:bg-slate-100 disabled:text-slate-500"
+                    />
+                  </div>
+
+                  {isDosenPengampu && selectedDetail.status_dosen_pengampu === 'Menunggu' && (
+                    <div className="flex space-x-3 pt-2">
+                      <button
+                        disabled={loading}
+                        onClick={() => handleDecision(selectedDetail.id_persetujuan_dosen || selectedDetail.id_persetujuan, 'Disetujui', dosenNote)}
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-[#006d64] hover:bg-[#005851] text-white font-medium text-xs transition shadow-xs cursor-pointer"
+                      >
+                        Setujui · Pengampu
+                      </button>
+                      <button
+                        disabled={loading}
+                        onClick={() => handleDecision(selectedDetail.id_persetujuan_dosen || selectedDetail.id_persetujuan, 'Ditolak', dosenNote)}
+                        className="py-2.5 px-4 rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 font-medium text-xs transition cursor-pointer"
+                      >
+                        Tolak · Pengampu
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
@@ -239,8 +257,8 @@ export default function ApprovalsPage() {
             } space-y-4`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">Laboran · Sinta Rahma</h3>
-                  <div className="text-[11px] text-slate-400">Verifikasi fisik & kesiapan alat laboratorium</div>
+                  <h3 className="text-sm font-bold text-slate-900">Laboran · Dina</h3>
+                  <div className="text-[11px] text-slate-400">Verifikasi fisik & persetujuan operasional lab</div>
                 </div>
                 <Badge status={selectedDetail.status_laboran || 'Menunggu'} />
               </div>
@@ -263,14 +281,14 @@ export default function ApprovalsPage() {
                 <div className="flex space-x-3 pt-2">
                   <button
                     disabled={loading}
-                    onClick={() => handleDecision(selectedDetail.id_persetujuan, 'Disetujui', laboranNote)}
+                    onClick={() => handleDecision(selectedDetail.id_persetujuan_laboran || selectedDetail.id_persetujuan, 'Disetujui', laboranNote)}
                     className="flex-1 py-2.5 px-4 rounded-xl bg-[#006d64] hover:bg-[#005851] text-white font-medium text-xs transition shadow-xs cursor-pointer"
                   >
                     Setujui · Laboran
                   </button>
                   <button
                     disabled={loading}
-                    onClick={() => handleDecision(selectedDetail.id_persetujuan, 'Ditolak', laboranNote)}
+                    onClick={() => handleDecision(selectedDetail.id_persetujuan_laboran || selectedDetail.id_persetujuan, 'Ditolak', laboranNote)}
                     className="py-2.5 px-4 rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 font-medium text-xs transition cursor-pointer"
                   >
                     Tolak · Laboran

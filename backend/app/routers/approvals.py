@@ -41,11 +41,15 @@ def list_approvals(
         laboran_app = next((a for a in all_apps if a.jenis_persetujuan == "laboran"), None)
 
         tools_summary = []
+        has_alat_khusus = False
         for da in booking.detail_alat_list:
+            is_khusus = da.alat.alat_khusus if da.alat else False
+            if is_khusus:
+                has_alat_khusus = True
             tools_summary.append({
-                "nama_alat": da.alat.nama_alat,
+                "nama_alat": da.alat.nama_alat if da.alat else "Alat",
                 "jumlah_pinjam": da.jumlah_pinjam,
-                "alat_khusus": da.alat.alat_khusus,
+                "alat_khusus": is_khusus,
                 "tenggat": da.tenggat_pengembalian
             })
 
@@ -58,6 +62,15 @@ def list_approvals(
             "catatan": app.catatan,
             "waktu_keputusan": app.waktu_keputusan,
             "penyetuju_nama": app.penyetuju.nama if app.penyetuju else None,
+            "has_alat_khusus": has_alat_khusus,
+            "id_persetujuan_dosen": dosen_app.id_persetujuan if dosen_app else None,
+            "id_persetujuan_laboran": laboran_app.id_persetujuan if laboran_app else None,
+            "status_dosen_pengampu": dosen_app.status if dosen_app else "Tidak diperlukan",
+            "catatan_dosen_pengampu": dosen_app.catatan if dosen_app else None,
+            "penyetuju_dosen": dosen_app.penyetuju.nama if dosen_app and dosen_app.penyetuju else None,
+            "status_laboran": laboran_app.status if laboran_app else None,
+            "catatan_laboran": laboran_app.catatan if laboran_app else None,
+            "penyetuju_laboran": laboran_app.penyetuju.nama if laboran_app and laboran_app.penyetuju else None,
             "booking": {
                 "id_peminjaman": booking.id_peminjaman,
                 "kode_peminjaman": f"PMJ-{booking.id_peminjaman:04d}",
@@ -67,14 +80,9 @@ def list_approvals(
                 "tanggal_pengajuan": booking.tanggal_pengajuan,
                 "tujuan": booking.tujuan,
                 "status_peminjaman": booking.status,
+                "has_alat_khusus": has_alat_khusus,
                 "tools": tools_summary
-            },
-            "status_dosen_pengampu": dosen_app.status if dosen_app else None,
-            "catatan_dosen_pengampu": dosen_app.catatan if dosen_app else None,
-            "penyetuju_dosen": dosen_app.penyetuju.nama if dosen_app and dosen_app.penyetuju else None,
-            "status_laboran": laboran_app.status if laboran_app else None,
-            "catatan_laboran": laboran_app.catatan if laboran_app else None,
-            "penyetuju_laboran": laboran_app.penyetuju.nama if laboran_app and laboran_app.penyetuju else None,
+            }
         })
 
     return results
