@@ -106,7 +106,7 @@ export default function RoomAvailabilityPage({ onNavigateToBooking }) {
       {/* Header */}
       <div>
         <div className="text-xs font-semibold tracking-wider text-teal-700 uppercase">
-          UC-03 / MAHASISWA · DOSEN / KETERSEDIAAN RUANGAN & ALAT
+          LAYANAN LABORATORIUM / KETERSEDIAAN RUANGAN & ALAT
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mt-1">
           Ketersediaan Ruangan dan Alat

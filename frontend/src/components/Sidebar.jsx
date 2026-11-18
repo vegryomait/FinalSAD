@@ -31,26 +31,26 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     {
       section: 'LAYANAN',
       items: [
-        { id: 'availability', label: 'Ketersediaan ruang & alat', code: '03', icon: CalendarDays },
-        { id: 'new-booking', label: 'Ajukan peminjaman', code: '04', icon: FilePlus },
-        { id: 'my-bookings', label: 'Riwayat peminjaman', code: '06', icon: Clock },
+        { id: 'availability', label: 'Ketersediaan ruang & alat', icon: CalendarDays },
+        { id: 'new-booking', label: 'Ajukan peminjaman', icon: FilePlus },
+        { id: 'my-bookings', label: 'Riwayat peminjaman', icon: Clock },
       ]
     },
     {
       section: 'PENGELOLAAN',
       items: [
-        canSeeApprovals && { id: 'approvals', label: 'Persetujuan khusus', code: '05', icon: CheckCircle },
-        canSeeReturns && { id: 'returns', label: 'Pengembalian alat', code: '07', icon: RotateCcw },
-        canSeeLate && { id: 'late-records', label: 'Keterlambatan', code: '08', icon: AlertTriangle },
-        canSeeInventory && { id: 'inventory', label: 'Inventaris', code: '09', icon: Boxes },
-        canSeeSchedules && { id: 'schedules', label: 'Jadwal kuliah', code: '10', icon: CalendarRange },
-        canSeeUsers && { id: 'users', label: 'Akun pengguna', code: '02', icon: Users },
+        canSeeApprovals && { id: 'approvals', label: 'Persetujuan peminjaman', icon: CheckCircle },
+        canSeeReturns && { id: 'returns', label: 'Pengembalian alat', icon: RotateCcw },
+        canSeeLate && { id: 'late-records', label: 'Keterlambatan', icon: AlertTriangle },
+        canSeeInventory && { id: 'inventory', label: 'Inventaris', icon: Boxes },
+        canSeeSchedules && { id: 'schedules', label: 'Jadwal kuliah', icon: CalendarRange },
+        canSeeUsers && { id: 'users', label: 'Akun pengguna', icon: Users },
       ].filter(Boolean)
     },
     {
       section: 'PELAPORAN',
       items: [
-        canSeeReports && { id: 'reports', label: 'Laporan bulanan', code: '11', icon: BarChart3 },
+        canSeeReports && { id: 'reports', label: 'Laporan bulanan', icon: BarChart3 },
       ].filter(Boolean)
     }
   ];
@@ -83,13 +83,12 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
+                      className={`w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
                         isActive
                           ? 'bg-[#004d49] text-white shadow-sm font-semibold'
                           : 'text-teal-200/75 hover:bg-teal-900/40 hover:text-white'
                       }`}
                     >
-                      <span className="text-xs font-mono text-teal-400/80 w-5">{item.code}</span>
                       <Icon className="w-4 h-4 opacity-80" />
                       <span className="truncate">{item.label}</span>
                     </button>

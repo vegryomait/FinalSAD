@@ -42,16 +42,16 @@ export default function App() {
 
   const getBreadcrumb = () => {
     switch (activeTab) {
-      case 'availability': return 'Ketersediaan ruangan dan alat (UC-03)';
-      case 'new-booking': return 'Ajukan peminjaman (UC-04)';
-      case 'my-bookings': return 'Riwayat peminjaman (UC-06)';
-      case 'approvals': return 'Persetujuan alat khusus (UC-05)';
-      case 'returns': return 'Pengembalian alat bertahap (UC-07)';
-      case 'late-records': return 'Pemantauan keterlambatan (UC-08)';
-      case 'inventory': return 'Inventaris ruangan & alat (UC-09)';
-      case 'schedules': return 'Jadwal kuliah & pengecualian (UC-10)';
-      case 'users': return 'Pengelolaan akun pengguna (UC-02)';
-      case 'reports': return 'Laporan bulanan (UC-11)';
+      case 'availability': return 'Ketersediaan ruangan dan alat';
+      case 'new-booking': return 'Ajukan peminjaman';
+      case 'my-bookings': return 'Riwayat peminjaman';
+      case 'approvals': return 'Persetujuan peminjaman';
+      case 'returns': return 'Pengembalian alat';
+      case 'late-records': return 'Pemantauan keterlambatan';
+      case 'inventory': return 'Inventaris ruangan & alat';
+      case 'schedules': return 'Jadwal kuliah & pengecualian';
+      case 'users': return 'Pengelolaan akun pengguna';
+      case 'reports': return 'Laporan bulanan';
       default: return 'Layanan Laboratorium';
     }
   };

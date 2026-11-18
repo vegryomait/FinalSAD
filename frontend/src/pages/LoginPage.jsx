@@ -76,7 +76,7 @@ export default function LoginPage() {
         <div className="max-w-md w-full mx-auto space-y-8">
           <div>
             <div className="text-xs font-semibold tracking-widest uppercase text-teal-700">
-              UC-01 / AKSES PENGGUNA
+              PORTAL LAYANAN / MASUK PENGGUNA
             </div>
             <h2 className="text-3xl font-bold text-slate-900 mt-2">Selamat datang kembali</h2>
             <p className="text-sm text-slate-500 mt-2">

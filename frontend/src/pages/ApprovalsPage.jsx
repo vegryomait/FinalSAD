@@ -62,7 +62,7 @@ export default function ApprovalsPage() {
       {/* Header */}
       <div>
         <div className="text-xs font-semibold tracking-wider text-teal-700 uppercase">
-          UC-05 / DOSEN PENGAMPU · LABORAN / PERSETUJUAN
+          DOSEN PENGAMPU · LABORAN / PERSETUJUAN PEMINJAMAN
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Persetujuan peminjaman</h1>
         <p className="text-sm text-slate-500 mt-1">

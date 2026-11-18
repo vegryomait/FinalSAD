@@ -31,7 +31,7 @@ export default function LateRecordsPage() {
       {/* Header */}
       <div>
         <div className="text-xs font-semibold tracking-wider text-teal-700 uppercase">
-          UC-08 / LABORAN · KEPALA LAB / KETERLAMBATAN
+          LABORAN · KEPALA LAB / PEMANTAUAN KETERLAMBATAN
         </div>
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mt-1">Pemantauan keterlambatan</h1>
         <p className="text-sm text-slate-500 mt-1">
