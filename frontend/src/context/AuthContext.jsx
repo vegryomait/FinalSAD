@@ -7,8 +7,8 @@ export const PRESET_USERS = [
   { role: 'Mahasiswa', name: 'Nadia Putri', email: 'nadia.putri@kampus.ac.id', idNum: '2204101021' },
   { role: 'Dosen Pengampu', name: 'Dr. Budi Santoso', email: 'budi@kampus.ac.id', idNum: '198603121' },
   { role: 'Dosen', name: 'Dr. Maya Dewi', email: 'maya@kampus.ac.id', idNum: '198904053' },
-  { role: 'Laboran', name: 'Sinta Rahma', email: 'sinta@kampus.ac.id', idNum: 'LAB-001' },
-  { role: 'Kepala Laboratorium', name: 'Prof. Hendra Kusuma', email: 'hendra@kampus.ac.id', idNum: '197508151' },
+  { role: 'Laboran', name: 'Dina', email: 'dina@kampus.ac.id', idNum: 'LAB-001' },
+  { role: 'Kepala Laboratorium', name: 'Ronald Tumbelaka', email: 'ronald@kampus.ac.id', idNum: '197508151' },
   { role: 'Dekan', name: 'Dr. Ratna Sari', email: 'ratna.sari@kampus.ac.id', idNum: '197001011' },
 ];
 
