@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import Badge from '../components/Badge';
-import { Plus, Search, Edit3, Boxes, Layers, DoorOpen } from 'lucide-react';
+import { Plus, Search, Edit3, Boxes, Layers, DoorOpen, Trash2 } from 'lucide-react';
 
 export default function InventoryPage() {
   const [activeTab, setActiveTab] = useState('unit'); // 'ruangan' | 'alat' | 'unit'
@@ -113,6 +113,45 @@ export default function InventoryPage() {
       loadData();
     } catch (err) {
       alert(err.message || 'Gagal menambahkan jenis alat.');
+    }
+  };
+
+  const handleDeleteRoom = async (room) => {
+    if (!window.confirm(`Yakin ingin menghapus ruangan "${room.nama_ruangan}"?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/api/rooms/${room.id_ruangan}`);
+      alert(`Ruangan "${room.nama_ruangan}" berhasil dihapus.`);
+      loadData();
+    } catch (err) {
+      alert(err.message || 'Gagal menghapus ruangan.');
+    }
+  };
+
+  const handleDeleteEq = async (eq) => {
+    if (!window.confirm(`Yakin ingin menghapus jenis alat "${eq.nama_alat}" beserta unit fisiknya?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/api/equipment/${eq.id_alat}`);
+      alert(`Jenis alat "${eq.nama_alat}" berhasil dihapus.`);
+      loadData();
+    } catch (err) {
+      alert(err.message || 'Gagal menghapus jenis alat.');
+    }
+  };
+
+  const handleDeleteUnit = async (u) => {
+    if (!window.confirm(`Yakin ingin menghapus unit fisik "${u.kode_inventaris}"?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/api/equipment/units/${u.id_unit}`);
+      alert(`Unit fisik "${u.kode_inventaris}" berhasil dihapus.`);
+      loadData();
+    } catch (err) {
+      alert(err.message || 'Gagal menghapus unit.');
     }
   };
 
@@ -232,10 +271,20 @@ export default function InventoryPage() {
                       <td className="py-3.5 px-6">
                         <Badge status={u.status} />
                       </td>
-                      <td className="py-3.5 px-6 text-right">
+                      <td className="py-3.5 px-6 text-right space-x-3">
                         <span className="text-teal-700 font-semibold hover:underline">
                           Ubah
                         </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteUnit(u);
+                          }}
+                          className="text-rose-600 hover:text-rose-800 font-semibold hover:underline text-xs cursor-pointer"
+                        >
+                          Hapus
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -426,6 +475,7 @@ export default function InventoryPage() {
                   <th className="py-3.5 px-6">Lokasi</th>
                   <th className="py-3.5 px-6">Kapasitas</th>
                   <th className="py-3.5 px-6">Status</th>
+                  <th className="py-3.5 px-6 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -436,6 +486,16 @@ export default function InventoryPage() {
                     <td className="py-3.5 px-6 font-mono text-slate-700">{r.kapasitas} orang</td>
                     <td className="py-3.5 px-6">
                       <Badge status={r.status} />
+                    </td>
+                    <td className="py-3.5 px-6 text-right">
+                      <button
+                        onClick={() => handleDeleteRoom(r)}
+                        className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-medium transition cursor-pointer"
+                        title="Hapus Ruangan"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Hapus</span>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -536,6 +596,7 @@ export default function InventoryPage() {
                   <th className="py-3.5 px-6">Deskripsi</th>
                   <th className="py-3.5 px-6">Kategori Khusus</th>
                   <th className="py-3.5 px-6">Stok Fisik Tersedia</th>
+                  <th className="py-3.5 px-6 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -552,6 +613,16 @@ export default function InventoryPage() {
                     </td>
                     <td className="py-3.5 px-6 font-mono font-semibold text-teal-800">
                       {eq.tersedia} dari {eq.total_unit} unit tersedia
+                    </td>
+                    <td className="py-3.5 px-6 text-right">
+                      <button
+                        onClick={() => handleDeleteEq(eq)}
+                        className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-medium transition cursor-pointer"
+                        title="Hapus Jenis Alat"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Hapus</span>
+                      </button>
                     </td>
                   </tr>
                 ))}

@@ -66,7 +66,7 @@ def update_equipment(
     id_alat: int,
     eq_in: EquipmentUpdate,
     db: Session = Depends(get_db),
-    current_user: Pengguna = Depends(require_roles(["Laboran"]))
+    current_user: Pengguna = Depends(require_roles(["Laboran", "Kepala Laboratorium"]))
 ):
     eq = db.query(Alat).filter(Alat.id_alat == id_alat).first()
     if not eq:
@@ -90,6 +90,79 @@ def update_equipment(
         rusak=sum(1 for u in units if u.status == "Rusak"),
         hilang=sum(1 for u in units if u.status == "Hilang")
     )
+
+@router.delete("/{id_alat}", status_code=status.HTTP_200_OK)
+def delete_equipment(
+    id_alat: int,
+    db: Session = Depends(get_db),
+    current_user: Pengguna = Depends(require_roles(["Laboran", "Kepala Laboratorium"]))
+):
+    eq = db.query(Alat).filter(Alat.id_alat == id_alat).first()
+    if not eq:
+        raise HTTPException(status_code=404, detail="Jenis alat tidak ditemukan.")
+
+    # Check if any unit is currently borrowed
+    borrowed = db.query(UnitAlat).filter(
+        UnitAlat.id_alat == id_alat,
+        UnitAlat.status == "Dipinjam"
+    ).count()
+    if borrowed > 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Jenis alat '{eq.nama_alat}' tidak dapat dihapus karena terdapat {borrowed} unit fisik yang sedang dipinjam."
+        )
+
+    # Clean up associated allocations and physical units
+    units = db.query(UnitAlat).filter(UnitAlat.id_alat == id_alat).all()
+    unit_ids = [u.id_unit for u in units]
+    if unit_ids:
+        from ..models import AlokasiUnitPeminjaman, DetailPengembalian
+        allocs = db.query(AlokasiUnitPeminjaman).filter(AlokasiUnitPeminjaman.id_unit.in_(unit_ids)).all()
+        alloc_ids = [a.id_alokasi for a in allocs]
+        if alloc_ids:
+            db.query(DetailPengembalian).filter(DetailPengembalian.id_alokasi.in_(alloc_ids)).delete(synchronize_session=False)
+            db.query(AlokasiUnitPeminjaman).filter(AlokasiUnitPeminjaman.id_alokasi.in_(alloc_ids)).delete(synchronize_session=False)
+
+    from ..models import DetailPeminjamanAlat, RiwayatKeterlambatan
+    detail_alats = db.query(DetailPeminjamanAlat).filter(DetailPeminjamanAlat.id_alat == id_alat).all()
+    da_ids = [da.id_detail_alat for da in detail_alats]
+    if da_ids:
+        db.query(RiwayatKeterlambatan).filter(RiwayatKeterlambatan.id_detail_alat.in_(da_ids)).delete(synchronize_session=False)
+        db.query(DetailPeminjamanAlat).filter(DetailPeminjamanAlat.id_detail_alat.in_(da_ids)).delete(synchronize_session=False)
+
+    db.query(UnitAlat).filter(UnitAlat.id_alat == id_alat).delete(synchronize_session=False)
+    eq_name = eq.nama_alat
+    db.delete(eq)
+    db.commit()
+    return {"message": f"Jenis alat '{eq_name}' dan seluruh unit fisiknya berhasil dihapus."}
+
+@router.delete("/units/{id_unit}", status_code=status.HTTP_200_OK)
+def delete_unit(
+    id_unit: int,
+    db: Session = Depends(get_db),
+    current_user: Pengguna = Depends(require_roles(["Laboran", "Kepala Laboratorium"]))
+):
+    unit = db.query(UnitAlat).filter(UnitAlat.id_unit == id_unit).first()
+    if not unit:
+        raise HTTPException(status_code=404, detail="Unit alat tidak ditemukan.")
+
+    if unit.status == "Dipinjam":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unit '{unit.kode_inventaris}' tidak dapat dihapus karena sedang dipinjam."
+        )
+
+    from ..models import AlokasiUnitPeminjaman, DetailPengembalian
+    allocs = db.query(AlokasiUnitPeminjaman).filter(AlokasiUnitPeminjaman.id_unit == id_unit).all()
+    alloc_ids = [a.id_alokasi for a in allocs]
+    if alloc_ids:
+        db.query(DetailPengembalian).filter(DetailPengembalian.id_alokasi.in_(alloc_ids)).delete(synchronize_session=False)
+        db.query(AlokasiUnitPeminjaman).filter(AlokasiUnitPeminjaman.id_alokasi.in_(alloc_ids)).delete(synchronize_session=False)
+
+    kode = unit.kode_inventaris
+    db.delete(unit)
+    db.commit()
+    return {"message": f"Unit '{kode}' berhasil dihapus."}
 
 # --- Physical Units ---
 @router.get("/units", response_model=List[UnitOut])

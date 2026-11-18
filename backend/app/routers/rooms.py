@@ -44,7 +44,7 @@ def update_room(
     id_ruangan: int,
     room_in: RoomUpdate,
     db: Session = Depends(get_db),
-    current_user: Pengguna = Depends(require_roles(["Laboran"]))
+    current_user: Pengguna = Depends(require_roles(["Laboran", "Kepala Laboratorium"]))
 ):
     room = db.query(Ruangan).filter(Ruangan.id_ruangan == id_ruangan).first()
     if not room:
@@ -56,6 +56,39 @@ def update_room(
     db.commit()
     db.refresh(room)
     return room
+
+@router.delete("/{id_ruangan}", status_code=status.HTTP_200_OK)
+def delete_room(
+    id_ruangan: int,
+    db: Session = Depends(get_db),
+    current_user: Pengguna = Depends(require_roles(["Laboran", "Kepala Laboratorium"]))
+):
+    room = db.query(Ruangan).filter(Ruangan.id_ruangan == id_ruangan).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Ruangan tidak ditemukan.")
+
+    # Check active bookings
+    active_loans = db.query(DetailPeminjamanRuang).join(Peminjaman).filter(
+        DetailPeminjamanRuang.id_ruangan == id_ruangan,
+        Peminjaman.status.in_(["Disetujui", "Berjalan", "Sebagian kembali"])
+    ).count()
+    if active_loans > 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Ruangan '{room.nama_ruangan}' tidak dapat dihapus karena sedang digunakan dalam transaksi peminjaman aktif."
+        )
+
+    # Clean up dependent records safely
+    schedules = db.query(JadwalKuliah).filter(JadwalKuliah.id_ruangan == id_ruangan).all()
+    for s in schedules:
+        db.query(PengecualianJadwal).filter(PengecualianJadwal.id_jadwal == s.id_jadwal).delete()
+    db.query(JadwalKuliah).filter(JadwalKuliah.id_ruangan == id_ruangan).delete()
+    db.query(DetailPeminjamanRuang).filter(DetailPeminjamanRuang.id_ruangan == id_ruangan).delete()
+
+    room_name = room.nama_ruangan
+    db.delete(room)
+    db.commit()
+    return {"message": f"Ruangan '{room_name}' berhasil dihapus."}
 
 @router.get("/availability")
 def check_room_availability(
