@@ -8,7 +8,7 @@ from ..database import get_db
 from ..models import (
     Peminjaman, DetailPeminjamanRuang, DetailPeminjamanAlat,
     Ruangan, Alat, UnitAlat, JadwalKuliah, PengecualianJadwal,
-    Persetujuan, Pengguna
+    Persetujuan, Pengguna, RiwayatKeterlambatan
 )
 from ..schemas import BookingCreate, BookingOut
 from ..auth import get_current_user, require_roles
@@ -119,6 +119,23 @@ def create_booking(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Pengajuan harus memiliki setidaknya ruangan atau alat yang dipinjam."
+        )
+
+    # 0. Validasi Skorsing / Pembatasan Keterlambatan (Aturan: 2x terlambat = skors peminjaman)
+    if current_user.status_akun == "Nonaktif":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Akun Anda berstatus Nonaktif / Diskors sehingga tidak dapat mengajukan peminjaman. Silakan hubungi Laboran (Kak Dina)."
+        )
+
+    total_late_count = db.query(RiwayatKeterlambatan).join(DetailPeminjamanAlat).join(Peminjaman).filter(
+        Peminjaman.id_pengguna == current_user.id_pengguna
+    ).count()
+
+    if total_late_count >= 2:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Pengajuan ditolak: Anda telah tercatat terlambat mengembalikan alat sebanyak {total_late_count} kali. Sesuai aturan laboratorium, peminjam yang terlambat 2 kali dalam satu semester diskors dan tidak diperkenankan meminjam lagi sampai semester selesai."
         )
 
     # 1. Validate Room if included

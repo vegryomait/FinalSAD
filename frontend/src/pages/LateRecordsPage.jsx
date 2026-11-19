@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import Badge from '../components/Badge';
-import { AlertTriangle, Clock, CheckCircle2, Filter } from 'lucide-react';
+import { AlertTriangle, Clock, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 export default function LateRecordsPage() {
   const [records, setRecords] = useState([]);
@@ -25,6 +25,9 @@ export default function LateRecordsPage() {
 
   const activeCount = records.filter((r) => r.status === 'Aktif').length;
   const finishedCount = records.filter((r) => r.status === 'Selesai').length;
+  const suspendedCount = new Set(
+    records.filter((r) => r.terkena_skors).map((r) => r.peminjam_nomor_identitas)
+  ).size;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -39,39 +42,56 @@ export default function LateRecordsPage() {
         </p>
       </div>
 
+      {/* Lab Policy Banner */}
+      <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start space-x-3 shadow-xs">
+        <ShieldAlert className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+        <div>
+          <span className="font-bold">Kebijakan Sanksi Laboratorium (Pak Ronald Tumbelaka):</span> Tidak ada denda uang keterlambatan. Namun, peminjam (mahasiswa) yang tercatat terlambat mengembalikan alat sebanyak <strong>2 (dua) kali dalam satu semester</strong> akan <strong>didiskors otomatis</strong> dari hak peminjaman alat maupun ruangan sampai semester selesai.
+        </div>
+      </div>
+
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TOTAL CATATAN</div>
-            <div className="text-3xl font-extrabold text-slate-900 mt-1">{records.length} kasus</div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TOTAL CATATAN</div>
+            <div className="text-2xl font-extrabold text-slate-900 mt-1">{records.length} kasus</div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
-            <Clock className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+            <Clock className="w-5 h-5" />
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TERLAMBAT AKTIF</div>
-            <div className="text-3xl font-extrabold text-rose-600 mt-1">{activeCount} kasus</div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TERLAMBAT AKTIF</div>
+            <div className="text-2xl font-extrabold text-rose-600 mt-1">{activeCount} kasus</div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
-            <AlertTriangle className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
+            <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">SELESAI DIKEMBALIKAN</div>
-            <div className="text-3xl font-extrabold text-emerald-700 mt-1">{finishedCount} kasus</div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">SELESAI KEMBALI</div>
+            <div className="text-2xl font-extrabold text-emerald-700 mt-1">{finishedCount} kasus</div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-            <CheckCircle2 className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+        </div>
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+          <div>
+            <div className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">DISKORS (≥2X)</div>
+            <div className="text-2xl font-extrabold text-rose-700 mt-1">{suspendedCount} orang</div>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-700">
+            <ShieldAlert className="w-5 h-5" />
           </div>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <label className="text-xs font-semibold text-slate-600">Filter Status:</label>
           <select
@@ -113,7 +133,18 @@ export default function LateRecordsPage() {
                 <tr key={r.id_riwayat} className="hover:bg-slate-50 transition-colors">
                   <td className="py-3.5 px-6">
                     <div className="font-mono font-bold text-teal-800">{r.kode_peminjaman}</div>
-                    <div className="font-semibold text-slate-900">{r.peminjam_nama}</div>
+                    <div className="flex items-center space-x-1.5 mt-0.5">
+                      <span className="font-semibold text-slate-900">{r.peminjam_nama}</span>
+                      {r.terkena_skors ? (
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold bg-rose-100 text-rose-700 rounded border border-rose-200">
+                          SKORS (≥2x)
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400">
+                          ({r.total_terlambat_peminjam || 1}x)
+                        </span>
+                      )}
+                    </div>
                     <div className="text-[11px] text-slate-400">{r.peminjam_nomor_identitas}</div>
                   </td>
                   <td className="py-3.5 px-6 font-semibold text-slate-800">{r.nama_alat}</td>

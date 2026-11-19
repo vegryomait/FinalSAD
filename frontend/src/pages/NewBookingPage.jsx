@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Trash2, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, Trash2, AlertCircle, CheckCircle2, Clock, ShieldAlert, AlertTriangle } from 'lucide-react';
 import Badge from '../components/Badge';
 
 export default function NewBookingPage({ initialRoomPref, onBookingSuccess }) {
@@ -38,10 +38,18 @@ export default function NewBookingPage({ initialRoomPref, onBookingSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [userLateStatus, setUserLateStatus] = useState(null);
 
   useEffect(() => {
     async function loadMasterData() {
       try {
+        try {
+          const lateStatus = await api.get('/api/late-records/user-status');
+          setUserLateStatus(lateStatus);
+        } catch (e) {
+          console.error('Failed to load user late status:', e);
+        }
+
         const rooms = await api.get('/api/rooms');
         setAllRooms(rooms);
         if (initialRoomPref?.id_ruangan) {
@@ -168,6 +176,32 @@ export default function NewBookingPage({ initialRoomPref, onBookingSuccess }) {
           Satu pengajuan untuk seluruh kebutuhan ruangan dan alat.
         </p>
       </div>
+
+      {/* Skorsing Banner */}
+      {userLateStatus?.is_suspended && (
+        <div className="p-5 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 shadow-sm flex items-start space-x-3.5">
+          <ShieldAlert className="w-6 h-6 text-rose-600 shrink-0 mt-0.5" />
+          <div>
+            <div className="font-bold text-sm text-rose-900">AKUN DALAM MASA SKORSING PEMINJAMAN</div>
+            <div className="text-xs text-rose-700 mt-1 leading-relaxed">
+              Anda tercatat telah terlambat mengembalikan alat sebanyak <strong>{userLateStatus.total_terlambat} kali</strong>. Sesuai aturan tata tertib laboratorium (Pak Ronald Tumbelaka), mahasiswa yang terlambat 2 kali dalam satu semester diskors dan tidak dapat mengajukan peminjaman alat atau ruangan hingga semester selesai.
+            </div>
+            <div className="text-[11px] text-rose-800 font-semibold mt-2">
+              Silakan menghubungi Kak Dina (Laboran) di kantor laboratorium untuk konfirmasi lebih lanjut.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 1x Keterlambatan Warning Banner */}
+      {!userLateStatus?.is_suspended && userLateStatus?.total_terlambat === 1 && (
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 shadow-xs flex items-start space-x-3 text-xs">
+          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <span className="font-bold">Peringatan Keterlambatan:</span> Anda telah memiliki <strong>1 catatan keterlambatan</strong> sebelumnya. Perhatian: jika terlambat 1 kali lagi (mencapai batas 2 kali dalam semester ini), akun Anda akan <strong>didiskors otomatis</strong> dari hak peminjaman laboratorium sampai semester selesai.
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start space-x-2">
@@ -466,18 +500,27 @@ export default function NewBookingPage({ initialRoomPref, onBookingSuccess }) {
           <div className="flex items-center space-x-3 pt-4">
             <button
               type="submit"
-              disabled={loading}
-              className="py-2.5 px-6 rounded-xl bg-[#006d64] hover:bg-[#005851] text-white font-medium text-sm transition shadow-xs cursor-pointer disabled:opacity-50"
+              disabled={loading || userLateStatus?.is_suspended}
+              className={`py-2.5 px-6 rounded-xl font-medium text-sm transition shadow-xs ${
+                userLateStatus?.is_suspended
+                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  : 'bg-[#006d64] hover:bg-[#005851] text-white cursor-pointer disabled:opacity-50'
+              }`}
             >
-              {loading ? 'Mengirim...' : 'Kirim pengajuan'}
+              {userLateStatus?.is_suspended
+                ? 'Pengajuan Tidak Diizinkan (Diskors)'
+                : loading
+                ? 'Mengirim...'
+                : 'Kirim pengajuan'}
             </button>
             <button
               type="button"
+              disabled={userLateStatus?.is_suspended}
               onClick={() => {
                 setTujuan('');
                 setCatatan('');
               }}
-              className="py-2.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm transition cursor-pointer"
+              className="py-2.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm transition cursor-pointer disabled:opacity-50"
             >
               Batal
             </button>

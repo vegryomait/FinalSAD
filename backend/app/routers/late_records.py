@@ -37,6 +37,37 @@ def sync_overdue_records(db: Session):
                 db.add(late)
     db.commit()
 
+@router.get("/user-status")
+def get_user_late_status(
+    db: Session = Depends(get_db),
+    current_user: Pengguna = Depends(get_current_user)
+):
+    sync_overdue_records(db)
+
+    records = db.query(RiwayatKeterlambatan).join(DetailPeminjamanAlat).join(Peminjaman).filter(
+        Peminjaman.id_pengguna == current_user.id_pengguna
+    ).all()
+
+    total_late = len(records)
+    active_late = sum(1 for r in records if r.status == "Aktif")
+    is_suspended = total_late >= 2 or current_user.status_akun == "Nonaktif"
+
+    return {
+        "id_pengguna": current_user.id_pengguna,
+        "nama": current_user.nama,
+        "total_terlambat": total_late,
+        "terlambat_aktif": active_late,
+        "is_suspended": is_suspended,
+        "status_akun": current_user.status_akun,
+        "pesan_skors": (
+            "Akun Anda sedang diskors dari peminjaman laboratorium karena telah mencapai batas 2 kali keterlambatan pengembalian alat dalam semester ini."
+            if is_suspended else (
+                "Perhatian: Anda memiliki 1 catatan keterlambatan. Jika terlambat 1 kali lagi (total 2 kali), akun Anda akan diskors dari peminjaman sampai semester selesai."
+                if total_late == 1 else None
+            )
+        )
+    }
+
 @router.get("")
 def list_late_records(
     status: Optional[str] = None,
@@ -63,6 +94,12 @@ def list_late_records(
         sudah_kembali = sum(1 for al in da.alokasi_list if al.status_alokasi == "Kembali")
         belum_kembali = total_dipinjam - sudah_kembali
 
+        # Count total late records for this borrower in the system
+        peminjam_total_late = db.query(RiwayatKeterlambatan).join(DetailPeminjamanAlat).join(Peminjaman).filter(
+            Peminjaman.id_pengguna == peminjam.id_pengguna
+        ).count()
+        terkena_skors = peminjam_total_late >= 2 or peminjam.status_akun == "Nonaktif"
+
         # Duration calculation
         end_time = r.waktu_selesai if r.waktu_selesai else now
         diff = end_time - r.mulai_terlambat
@@ -87,7 +124,9 @@ def list_late_records(
             "waktu_selesai": r.waktu_selesai,
             "durasi_terlambat": durasi_str,
             "status": r.status,
-            "catatan": r.catatan
+            "catatan": r.catatan,
+            "total_terlambat_peminjam": peminjam_total_late,
+            "terkena_skors": terkena_skors
         })
 
     return results

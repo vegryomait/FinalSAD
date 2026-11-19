@@ -123,9 +123,9 @@ def seed_database():
     u_osc3 = db.query(UnitAlat).filter(UnitAlat.kode_inventaris == "OSC-003").first()
     u_mlt1 = db.query(UnitAlat).filter(UnitAlat.kode_inventaris == "MLT-011").first()
 
-    # 7. Mock Booking: PMJ-0138 (Nadia Putri - Sebagian Kembali)
+    # 7. Mock Booking: PMJ-0138 (Rizky Pratama - Sebagian Kembali, Terlambat Mengembalikan)
     pmj_138 = Peminjaman(
-        id_pengguna=nadia.id_pengguna,
+        id_pengguna=rizky.id_pengguna,
         tanggal_pengajuan=datetime(2026, 11, 13, 8, 0),
         tujuan="Praktikum pengukuran rangkaian elektronika daya",
         status="Sebagian kembali",

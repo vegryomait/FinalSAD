@@ -2,7 +2,7 @@ import sys
 from fastapi.testclient import TestClient
 from backend.app.main import app
 from backend.app.database import SessionLocal
-from backend.app.models import UnitAlat, Pengguna
+from backend.app.models import UnitAlat, Pengguna, Peminjaman
 
 def run_rtm_tests():
     client = TestClient(app)
@@ -11,12 +11,21 @@ def run_rtm_tests():
     print("=" * 65)
 
     # 0. Setup & Auth Tokens
-    # Pastikan unit uji siap dipinjam
+    # Pastikan unit uji siap dipinjam & bersihkan transaksi uji sebelumnya
     db = SessionLocal()
     db.query(UnitAlat).filter(UnitAlat.kode_inventaris.in_(["OSC-001", "OSC-004", "CAM-001", "VR-001"])).update({
         "status": "Tersedia",
         "kondisi": "Baik"
     }, synchronize_session=False)
+
+    old_test_bookings = db.query(Peminjaman).filter(Peminjaman.tujuan.in_([
+        "Diskusi Proyek Perangkat Lunak Mandiri",
+        "Praktikum Mandiri Elektronika Dasar",
+        "test"
+    ])).all()
+    for ot in old_test_bookings:
+        db.delete(ot)
+
     db.commit()
 
     # Login pengguna uji
@@ -168,7 +177,24 @@ def run_rtm_tests():
     print("\n[TC-10] Memantau Keterlambatan dan Pembatasan (UC-10):")
     res_late = client.get("/api/late-records", headers=h_lab)
     assert res_late.status_code == 200
-    print(f"  ✓ Sistem berhasil mendeteksi {len(res_late.json())} catatan keterlambatan dan status denda/pembatasan.")
+    print(f"  ✓ Sistem berhasil mendeteksi {len(res_late.json())} catatan keterlambatan dan status pembatasan.")
+
+    # Verifikasi Aturan Skorsing 2x Keterlambatan:
+    r_rizky = client.post("/api/auth/login", json={"username": "rizky@kampus.ac.id", "password": "password123"})
+    assert r_rizky.status_code == 200
+    h_rizky = {"Authorization": f"Bearer {r_rizky.json()['access_token']}"}
+
+    r_stat = client.get("/api/late-records/user-status", headers=h_rizky)
+    assert r_stat.status_code == 200
+    assert r_stat.json()["is_suspended"] is True, "Rizky seharusnya diskors karena >= 2x terlambat"
+    print(f"  ✓ Validasi status pengguna: Peminjam terdeteksi diskors ({r_stat.json()['total_terlambat']}x terlambat).")
+
+    r_blocked = client.post("/api/bookings", json={
+        "tujuan": "Uji Coba Pinjam saat Skors",
+        "ruang": {"id_ruangan": 1, "tanggal": "2026-11-29", "jam_mulai": "10:00", "jam_selesai": "12:00"}
+    }, headers=h_rizky)
+    assert r_blocked.status_code == 403, "Pengajuan peminjam yang diskors harus ditolak dengan 403 Forbidden"
+    print(f"  ✓ Sanksi Skorsing 2x Terlambat diverifikasi 100%: Pengajuan peminjam otomatis terblokir HTTP 403 Forbidden.")
 
     # [TC-11] Memperbarui Data Inventaris
     print("\n[TC-11] Memperbarui Data Inventaris (UC-11):")
